@@ -2,8 +2,10 @@
 // .env file with DB connect details required
 // creates a default manager and default employee
 require('dotenv').config()
+const bcrypt = require('bcryptjs')
 const { Client } = require('pg')
 const client = new Client()
+
 
 client.connect()
 execScript(client, (err) => {
@@ -15,7 +17,10 @@ execScript(client, (err) => {
   return client.end()
 })
 
-function execScript(client, cb) {
+
+async function execScript(client, cb) {
+  const USER_PASS_HASH = await bcrypt.hash('user', 10);
+  const ADMIN_PASS_HASH = await bcrypt.hash('admin', 10);
   const HARD_RESET_DB = `
     DROP TABLE IF EXISTS shift;
     DROP TABLE IF EXISTS app_user;
@@ -23,7 +28,8 @@ function execScript(client, cb) {
       id        SERIAL PRIMARY KEY,
       username  VARCHAR(128) NOT NULL,
       password  VARCHAR NOT NULL,
-      manager   BOOLEAN DEFAULT FALSE
+      manager   BOOLEAN DEFAULT FALSE,
+      UNIQUE(username)
     );  
     CREATE TABLE shift (
       id            SERIAL PRIMARY KEY,
@@ -32,6 +38,8 @@ function execScript(client, cb) {
       end_time           TIMESTAMP NOT NULL,
       FOREIGN KEY (app_user_id) REFERENCES app_user(id) ON DELETE CASCADE
     );
+    INSERT INTO app_user(username, password, manager) VALUES('admin', '${ADMIN_PASS_HASH}', true) RETURNING *;
+    INSERT INTO app_user(username, password, manager) VALUES('user', '${USER_PASS_HASH}', false) RETURNING *;
   `
   const sql = HARD_RESET_DB
   var statements = sql.split(/;\s*$/m);
