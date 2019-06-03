@@ -8,8 +8,10 @@ const IndexPage = () => {
   const [err, updateErr] = useState(null);
   const [shifts, updateShifts] = useState([]);
   useEffect(() => {
-    console.log('test');
-    fetch('http://localhost:3333/shifts')
+    const fetchOptions = {
+      credentials: 'include',
+    };
+    fetch('http://localhost:3333/shifts', fetchOptions)
       .then(res => res.json())
       .then(({ res, err }) => {
         if (err) {
@@ -19,7 +21,7 @@ const IndexPage = () => {
         updateErr(null);
         updateShifts(res.shifts);
       })
-      .catch(console.log);
+      .catch(err => updateErr(err.message));
   }, []);
 
   return (
@@ -27,8 +29,11 @@ const IndexPage = () => {
       <SEO title="Home" />
       <h1>View Shifts</h1>
       {err && <p>{err}</p>}
-      {shifts.map(shift => (
-        <div>{shift.startTime}</div>
+      {shifts.map(({ startTime, firstName, lastName }) => (
+        <div>
+          <div>{new Date(startTime).toLocaleString()}</div>
+          <div>{`${firstName} ${lastName}`}</div>
+        </div>
       ))}
       <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }} />
       <div>

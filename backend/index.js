@@ -12,7 +12,7 @@ function handlePromiseRejection(middleware) {
 }
 
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:8000' }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(
