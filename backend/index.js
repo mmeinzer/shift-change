@@ -93,6 +93,7 @@ app.post(
   handlePromiseRejection(async (req, res, next) => {
     const { user, body } = req;
     if (!user) throw new Error('You must be logged in to do that');
+    if (!user.manager) throw new Error('Only managers can create shifts');
     const {
       employee,
       startTime: startTimeString,
@@ -108,7 +109,6 @@ app.post(
       startTime = new Date(startTimeString);
       endTime = new Date(endTimeString);
     } catch (err) {
-      console.log(err.message);
       throw new Error("Couldn't parse start or end-time strings");
     }
     if (
@@ -138,8 +138,6 @@ app.post(
       values: [employee],
     };
     const shifts = await client.query(shiftsQuery).then(data => data.rows);
-    console.log(shifts);
-    console.log({ startTime, endTime });
     const overlapsExistingShift = shifts.some(
       ({ start_time: existingStart, end_time: existingEnd }) => {
         if (startTime > existingStart && startTime < existingEnd) return true;
