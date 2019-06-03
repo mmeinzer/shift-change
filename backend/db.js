@@ -1,8 +1,9 @@
-const { Client } = require('pg')
-const client = new Client()
+const { Client } = require('pg');
+
+const client = new Client();
 
 // requires environment variables to connect:
 // PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT
-client.connect()
+client.connect();
 
-module.exports = client
+module.exports = client;
