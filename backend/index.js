@@ -140,8 +140,8 @@ app.post(
     const shifts = await client.query(shiftsQuery).then(data => data.rows);
     const overlapsExistingShift = shifts.some(
       ({ start_time: existingStart, end_time: existingEnd }) => {
-        if (startTime > existingStart && startTime < existingEnd) return true;
-        if (endTime > existingStart && endTime < existingEnd) return true;
+        if (startTime >= existingStart && startTime <= existingEnd) return true;
+        if (endTime >= existingStart && endTime <= existingEnd) return true;
         return false;
       }
     );
@@ -158,6 +158,7 @@ app.post(
     const { start_time: newStart, end_time: newEnd } = await client
       .query(shiftInsertQuery)
       .then(data => data.rows[0]);
+    console.log('created shift');
     res.json({ res: { startTime: newStart, endTime: newEnd } });
   })
 );
@@ -169,22 +170,24 @@ app.get(
     if (!user) throw new Error('You must be logged in to do that');
     const shiftsQuery = {
       text: `
-        SELECT shift.start_time, shift.end_time, app_user.username, app_user.first_name, app_user.last_name
+        SELECT shift.id, shift.start_time, shift.end_time, app_user.username, app_user.first_name, app_user.last_name
         FROM shift
         LEFT JOIN app_user
         ON shift.app_user_id = app_user.id
-        ORDER BY shift.start_time ASC;
+        ORDER BY app_user.last_name, shift.start_time ASC;
       `,
     };
-    const shifts = await client.query(shiftsQuery).then(data =>
-      data.rows.map(row => ({
+    const shifts = await client.query(shiftsQuery).then(data => {
+      console.log(data.rows);
+      return data.rows.map(row => ({
+        id: row.id,
         username: row.username,
         startTime: row.start_time,
         endTime: row.end_time,
         firstName: row.first_name,
         lastName: row.last_name,
-      }))
-    );
+      }));
+    });
     res.json({ res: { shifts } });
   })
 );
