@@ -1,3 +1,4 @@
+A `.env` with DB connection information is require to connect to the persistent postgreSQL instance
 # How to run
 - `git clone https://github.com/mmeinzer/shift-change.git`
 - The `.env` file containing database connection info and the app secret should be moved into `shift-change/backend/`
