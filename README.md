@@ -1,4 +1,10 @@
-A `.env` with DB connection information is require to connect to the persistent postgreSQL instance
+**A `.env` file with Postgres connection information is required to properly connect to the persistent PostgreSQL instance**
+
+## Technology Used
+- Express JS for route handlers and middleware
+- PostgreSQL database and `node-postgres` for db connection and queries
+- Gatsby/React for frontend application
+
 ## How to run
 - `git clone https://github.com/mmeinzer/shift-change.git`
 - The `.env` file containing database connection info and the app secret should be moved into `shift-change/backend/`
